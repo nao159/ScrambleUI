@@ -12,6 +12,7 @@ struct ContentView: View {
     @State private var usedWords = [String]()
     @State private var rootWord = ""
     @State private var newWord = ""
+    @State private var score = 0
     
     @State private var errorTitle = ""
     @State private var errorMessage = ""
@@ -31,6 +32,12 @@ struct ContentView: View {
                 }
             }
             .navigationTitle(rootWord)
+            .navigationBarItems(leading:
+                                    Button(action: {
+                                        startGame()
+                                    }, label: {
+                                        Text("start new game")
+                                    }), trailing: Text("\(score)"))
             .onAppear(perform: {
                 startGame()
             })
@@ -56,6 +63,11 @@ struct ContentView: View {
             wordError(title: "wrong word", message: "this word doesnt exist in the real word")
             return
         }
+        guard isTooShort(word: answer) else {
+            wordError(title: "short word", message: "your word is too short")
+            return
+        }
+        score += answer.count
         usedWords.insert(answer, at: 0)
         newWord = ""
     }
@@ -94,6 +106,13 @@ struct ContentView: View {
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         
         return misspelledRange.location == NSNotFound
+    }
+    
+    func isTooShort(word: String) -> Bool {
+        if word.count < 3 {
+            return false
+        }
+        return true
     }
     
     func wordError(title: String, message: String) {
